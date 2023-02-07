@@ -1,52 +1,46 @@
-## name of workflow
-name: Run Arxiv Papers Daily
- 
-# Controls when the workflow will run
+name: Run Daily Arxiv
+
 on:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
   schedule:
-    - cron:  "* 12 * * *"  # Runs every minute of 12th hour
+    - cron: "00 12 * * *"
+  push:
+    branches:
+      - main
 env:
- 
-  GITHUB_USER_NAME: yangzhouzhou # your github id
-  GITHUB_USER_EMAIL: 15047137010@163.com # your email address
-  
-  
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+  GITHUB_NAME: Yangzhouzhou
+  GITHUB_EMAIL: 15047137010@163.com
+
+
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  sync:
     name: update
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Set up Python Env
+        uses: actions/checkout@v3.0.2
+      - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6        
- 
+          python-version: 3.8
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install arxiv
+          pip install arxivscraper
           pip install requests
-          
+
       - name: Run daily arxiv 
         run: |
           python daily_arxiv.py
           
-      - name: Push new cv-arxiv-daily.md
-        uses: github-actions-x/commit@v2.8
+      - name: Push new daily.md
+        uses: github-actions-x/commit@v2.9
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Github Action Automatic Update CV Arxiv Papers"
-          files: README.md Yang-Arxiv-daily.json
+          github-token: ${{ secrets.G_T }}
+          commit-message: "update today arxiv"
+          files: README.md daily.json
           rebase: 'true'
-          name: ${{ env.GITHUB_USER_NAME }}
-          email: ${{ env.GITHUB_USER_EMAIL }}
+          name: ${{ env.GITHUB_NAME }}
+          email: ${{ env.GITHUB_EMAIL }}
